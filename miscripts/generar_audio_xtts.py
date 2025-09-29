@@ -385,15 +385,29 @@ def main():
     else:
         print("✅ PyTorch compatible")
     
+    # Verificar si existe modelo personalizado
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    modelo_personalizado = os.path.join(script_dir, "mi_voz.WAV")
+    tiene_modelo_personalizado = os.path.exists(modelo_personalizado)
+    
+    if tiene_modelo_personalizado:
+        print("🎤 Modelo personalizado detectado: mi_voz.WAV")
+    
     # Opciones del script
     print("\n📋 OPCIONES:")
     print("1. Demo de pronunciación técnica")
     print("2. Texto personalizado")
     print("3. Texto personalizado con clonación de voz")
-    print("4. Salir")
+    if tiene_modelo_personalizado:
+        print("4. 🔥 Usar modelo personalizado mi_voz")
+        print("5. ⚙️  Configurar modelo personalizado")
+        print("6. Salir")
+    else:
+        print("4. Salir")
     
     try:
-        choice = input("\n👉 Selecciona una opción (1-4): ").strip()
+        max_option = 6 if tiene_modelo_personalizado else 4
+        choice = input(f"\n👉 Selecciona una opción (1-{max_option}): ").strip()
         
         if choice == "1":
             print("\n🚀 Ejecutando demo de pronunciación...")
@@ -451,7 +465,59 @@ def main():
             else:
                 print("❌ Texto vacío")
         
-        elif choice == "4":
+        elif choice == "4" and tiene_modelo_personalizado:
+            print("\n🎤 Usando modelo personalizado mi_voz...")
+            
+            # Importar clase del modelo personalizado
+            try:
+                from modelo_mi_voz import ModeloMiVoz
+                
+                modelo = ModeloMiVoz("mi_voz.WAV")
+                text = input("📝 Tu texto: ").strip()
+                
+                if text:
+                    output_file = input("📄 Archivo de salida (Enter para 'audio_mi_voz.wav'): ").strip()
+                    if not output_file:
+                        output_file = "audio_mi_voz.wav"
+                    
+                    print("\n🚀 Generando con tu modelo personalizado...")
+                    if modelo.generar_audio(text, output_file):
+                        print(f"\n🎉 ¡Audio generado con tu voz personalizada!")
+                        print(f"🎧 Reproduce '{output_file}' para escuchar tu modelo")
+                    else:
+                        print("\n❌ Error con modelo personalizado")
+                else:
+                    print("❌ Texto vacío")
+                    
+            except ImportError:
+                print("❌ No se pudo cargar el modelo personalizado")
+                print("💡 Ejecuta: python modelo_mi_voz.py")
+        
+        elif choice == "5" and tiene_modelo_personalizado:
+            print("\n⚙️  Configurando modelo personalizado...")
+            
+            try:
+                from modelo_mi_voz import ModeloMiVoz
+                
+                modelo = ModeloMiVoz("mi_voz.WAV")
+                
+                print("🧠 Optimizando parámetros para tu voz...")
+                textos_prueba = [
+                    "Optimización de mi modelo de voz personalizado",
+                    "Desarrollo web con HTML5, CSS3 y JavaScript ES6",
+                    "Pronunciación de números: 123, 45.5%, emails: test@example.com"
+                ]
+                
+                if modelo.entrenar_parametros(textos_prueba):
+                    print("\n🎉 ¡Modelo personalizado optimizado!")
+                    print("💡 Ahora usa la opción 4 para generar con mejor calidad")
+                else:
+                    print("\n❌ Error en la optimización")
+                    
+            except ImportError:
+                print("❌ No se pudo cargar el modelo personalizado")
+        
+        elif choice == str(max_option):
             print("👋 ¡Hasta luego!")
             return True
         

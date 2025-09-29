@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+🎤 MI_VOZ - Ejecutable TTS CLI
+============================
+Script ejecutable para usar el generador TTS personalizado desde cualquier terminal
+"""
+
+import os
+import sys
+
+# Agregar el directorio del script al path para importar el módulo
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, script_dir)
+
+# Activar entorno virtual si existe
+venv_path = os.path.join(os.path.dirname(script_dir), "venv")
+if os.path.exists(venv_path):
+    # Configurar variables de entorno para el venv
+    os.environ["VIRTUAL_ENV"] = venv_path
+    os.environ["PATH"] = os.path.join(venv_path, "bin") + ":" + os.environ.get("PATH", "")
+    
+    # Configurar Python path
+    python_site_packages = os.path.join(venv_path, "lib", "python3.11", "site-packages")
+    if os.path.exists(python_site_packages):
+        sys.path.insert(0, python_site_packages)
+
+# Configurar PyTorch para compatibilidad
+os.environ["PYTORCH_LOAD_WEIGHTS_ONLY"] = "false"
+
+try:
+    # Importar y ejecutar el módulo principal
+    from modelo_mi_voz import main_cli
+    
+    if __name__ == "__main__":
+        exito = main_cli()
+        sys.exit(0 if exito else 1)
+        
+except ImportError as e:
+    print(f"❌ Error de importación: {e}")
+    print(f"💡 Verifica que estés en el directorio correcto: {script_dir}")
+    print(f"💡 Archivo buscado: {os.path.join(script_dir, 'modelo_mi_voz.py')}")
+    sys.exit(1)
+except Exception as e:
+    print(f"❌ Error ejecutando mi_voz: {e}")
+    sys.exit(1)
